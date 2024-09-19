@@ -1,6 +1,10 @@
 pipeline {
     agent any
-
+    docker {
+            image 'docker/compose:1.29.2'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+        
     environment {
         // Load environment variables from .env file if needed
         DATABASE_URL = 'postgres://user:password@db:5432/mydatabase'
@@ -19,7 +23,7 @@ pipeline {
             steps {
                 script {
                     // Build and run services with Docker Compose
-                    sh '/usr/local/bin/docker-compose -f docker-compose.yml up --build -d'
+                    sh 'docker-compose -f docker-compose.yml up --build -d'
                 }
             }
         }
@@ -42,7 +46,7 @@ pipeline {
     post {
         always {
             // Always cleanup Docker environment after build
-            sh '/usr/local/bin/docker-compose down -v'
+            sh 'docker-compose down -v'
         }
     }
 }
