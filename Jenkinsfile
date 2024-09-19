@@ -1,6 +1,5 @@
 pipeline {
     agent any
-    docker 
 
     environment {
         // Load environment variables from .env file if needed
