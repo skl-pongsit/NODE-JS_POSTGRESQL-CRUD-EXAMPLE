@@ -11,7 +11,7 @@ pipeline {
             steps {
                 // Clone the repository
                 //git 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
-                ls -la
+                sh 'ls -la'
             }
         }
 
