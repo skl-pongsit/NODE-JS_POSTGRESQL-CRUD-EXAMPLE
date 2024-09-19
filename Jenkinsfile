@@ -42,7 +42,7 @@ pipeline {
     post {
         always {
             // Always cleanup Docker environment after build
-            sh 'docker-compose down -v'
+            sh '/usr/local/bin/docker-compose down -v'
         }
     }
 }
