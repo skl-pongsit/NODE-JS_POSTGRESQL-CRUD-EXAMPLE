@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Build and run services with Docker Compose
-                    sh 'docker-compose -f docker-compose.yml up --build -d'
+                    sh '/usr/local/bin/docker-compose -f docker-compose.yml up --build -d'
                 }
             }
         }
