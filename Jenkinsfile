@@ -1,10 +1,7 @@
 pipeline {
     agent any
-    docker {
-            image 'docker/compose:1.29.2'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-        
+    docker 
+
     environment {
         // Load environment variables from .env file if needed
         DATABASE_URL = 'postgres://user:password@db:5432/mydatabase'
