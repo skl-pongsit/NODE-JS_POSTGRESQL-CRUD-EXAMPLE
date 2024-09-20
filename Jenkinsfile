@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker/compose:1.29.2'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         // Load environment variables from .env file if needed
@@ -10,18 +15,11 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 // Clone the repository
-                //git 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
+                //git 'https://github.com/username/node-postgres-docker-project.git'
                 sh 'ls -la'
             }
         }
 
-        docker {
-            image 'docker/compose:1.29.2'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-            }
-          }
-       }   
-       
         stage('Build and Run Docker Compose') {
             steps {
                 script {
