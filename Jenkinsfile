@@ -19,7 +19,7 @@ pipeline {
             steps {
                 script {
                     // Build and run services with Docker Compose
-                    sh 'docker-compose -f docker-compose.yml up --build -d'
+                    sh '/usr/local/bin/docker-compose -f docker-compose.yml up --build -d'
                 }
             }
         }
@@ -27,14 +27,14 @@ pipeline {
         stage('Run Tests') {
             steps {
                 // Run any tests for your Node.js app (if applicable)
-                sh 'docker-compose exec api npm test'
+                sh '/usr/local/bin/docker-compose exec api npm test'
             }
         }
 
         stage('Clean Up') {
             steps {
                 // Stop and remove Docker containers
-                sh 'docker-compose down'
+                sh '/usr/local/bin/docker-compose down'
             }
         }
     }
@@ -42,7 +42,7 @@ pipeline {
     post {
         always {
             // Always cleanup Docker environment after build
-            sh 'docker-compose down -v'
+            sh '/usr/local/bin/docker-compose down -v'
         }
     }
 }
