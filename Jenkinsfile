@@ -1,48 +1,50 @@
 pipeline {
     agent any
 
-    environment {
-        // Load environment variables from .env file if needed
-        DATABASE_URL = 'postgres://user:password@db:5432/mydatabase'
-    }
-
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                // Clone the repository
-                //git 'https://github.com/username/node-postgres-docker-project.git'
-                sh 'ls -la'
+                // ดึงโค้ดจาก GitHub
+                checkout scm
             }
         }
 
-        stage('Build and Run Docker Compose') {
+        stage('Build') {
             steps {
                 script {
-                    // Build and run services with Docker Compose
-                    sh '/usr/local/bin/docker-compose -f docker-compose.yml up --build -d'
+                    // สร้าง Docker image
+                    sh 'docker build -t your-image-name:latest .'
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                // Run any tests for your Node.js app (if applicable)
-                sh '/usr/local/bin/docker-compose exec api npm test'
+                // รันการทดสอบ
+                sh 'npm install'
+                sh 'npm test'
             }
         }
 
-        stage('Clean Up') {
+        stage('Deploy to Production') {
             steps {
-                // Stop and remove Docker containers
-                sh '/usr/local/bin/docker-compose down'
+                script {
+                    // Deploy ไปยัง Production (ตัวเลือก)
+                    kubernetesDeploy(
+                        configs: 'k8s/deployment-production.yaml',
+                        kubeconfigId: 'your-kubeconfig-id'
+                    )
+                }
             }
         }
     }
 
     post {
-        always {
-            // Always cleanup Docker environment after build
-            sh '/usr/local/bin/docker-compose down -v'
+        success {
+            echo 'Deployment successful!'
+        }
+        failure {
+            echo 'Deployment failed.'
         }
     }
 }
