@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker/compose:1.29.2'
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         // Load environment variables from .env file if needed
