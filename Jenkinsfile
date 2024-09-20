@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:latest' // ใช้ Docker image ที่มี Docker ติดตั้ง
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // เชื่อมต่อ Docker socket
+        }
+    }
 
     stages {
         stage('Checkout') {
@@ -13,7 +18,7 @@ pipeline {
             steps {
                 script {
                     // สร้าง Docker image
-                    sh 'docker build -t your-image-name:latest .'
+                    sh 'docker build -t pond:latest .'
                 }
             }
         }
