@@ -38,7 +38,7 @@ pipeline {
                     kubernetesDeploy(
                         // configs: 'k8s/deployment-production.yaml',
                         // kubeconfigId: 'your-kubeconfig-id'
-                        ls -la
+                        sh 'ls -la'
                     )
                 }
             }
