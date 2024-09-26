@@ -36,9 +36,8 @@ pipeline {
                 script {
                     // Deploy ไปยัง Production (ตัวเลือก)
                     kubernetesDeploy(
-                        // configs: 'k8s/deployment-production.yaml',
-                        // kubeconfigId: 'your-kubeconfig-id'
-                        sh 'ls -la'
+                        configs: 'k8s/deployment-production.yaml',
+                        kubeconfigId: 'your-kubeconfig-id'
                     )
                 }
             }
