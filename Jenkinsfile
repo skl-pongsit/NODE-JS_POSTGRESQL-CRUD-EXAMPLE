@@ -7,10 +7,10 @@ pipeline {
     }
 
     stages {
-          stage('Clone repository') {
+           stage('Checkout') {
             steps {
-                // Clone Source Code จาก GitHub
-                git branch: 'main', url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
+                // ดึงโค้ดจาก GitHub
+                checkout scm
             }
         }
 
