@@ -7,10 +7,10 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
+          stage('Clone repository') {
             steps {
-                // ดึงโค้ดจาก GitHub
-                checkout scm
+                // Clone Source Code จาก GitHub
+                git branch: 'main', url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
             }
         }
 
@@ -37,7 +37,7 @@ pipeline {
                     // Deploy ไปยัง Production (ตัวเลือก)
                     kubernetesDeploy(
                         configs: 'k8s/deployment-production.yaml',
-                        kubeconfigId: 'your-kubeconfig-id'
+                         kubeconfigId: 'your-kubeconfig-id'
                     )
                 }
             }
