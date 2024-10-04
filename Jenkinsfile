@@ -1,55 +1,60 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:latest' // ใช้ Docker image ที่มี Docker ติดตั้ง
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // เชื่อมต่อ Docker socket
-        }
+  agent {
+    kubernetes {
+      label 'dind'
+      defaultContainer 'docker'
+      yaml """
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: jenkins
+spec:
+  containers:
+    - name: docker
+      image: docker:latest
+      command:
+        - /bin/cat
+      tty: true
+      volumeMounts:
+        - name: dind-certs
+          mountPath: /certs
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+        - name: DOCKER_CERT_PATH
+          value: /certs
+        - name: DOCKER_TLS_VERIFY
+          value: 1
+        - name: DOCKER_HOST
+          value: tcp://localhost:2376
+    - name: dind
+      image: docker:dind
+      securityContext:
+        privileged: true
+      env:
+        - name: DOCKER_TLS_CERTDIR
+          value: /certs
+      volumeMounts:
+        - name: dind-storage
+          mountPath: /var/lib/docker
+        - name: dind-certs
+          mountPath: /certs
+  volumes:
+    - name: dind-storage
+      emptyDir: {}
+    - name: dind-certs
+      emptyDir: {}
+"""
     }
-
-    stages {
-           stage('Checkout') {
-            steps {
-                // ดึงโค้ดจาก GitHub
-                checkout scm
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    // สร้าง Docker image
-                    sh 'docker build -t pond:latest .'
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                // รันการทดสอบ
-                sh 'npm install'
-                sh 'npm test'
-            }
-        }
-
-        stage('Deploy to Production') {
-            steps {
-                script {
-                    // Deploy ไปยัง Production (ตัวเลือก)
-                    kubernetesDeploy(
-                        configs: 'k8s/deployment-production.yaml',
-                         kubeconfigId: 'your-kubeconfig-id'
-                    )
-                }
-            }
-        }
+  }
+  stages {
+    stage('Run Docker Things') {
+      steps {
+        sh 'printenv'
+        sh 'docker info'
+      }
     }
-
-    post {
-        success {
-            echo 'Deployment successful!'
-        }
-        failure {
-            echo 'Deployment failed.'
-        }
-    }
+  }
 }
