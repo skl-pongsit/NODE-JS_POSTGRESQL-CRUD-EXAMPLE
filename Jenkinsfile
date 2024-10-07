@@ -8,7 +8,7 @@ metadata:
   labels:
     app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins  # ระบุ serviceAccount ที่จะใช้
+  serviceAccountName: jenkins-runner
   containers:
   - name: kubectl
     image: bitnami/kubectl:latest
@@ -17,52 +17,19 @@ spec:
     tty: true
   - name: docker
     image: docker:19.03.12
-    securityContext:
-      privileged: true  # ต้องการสิทธิพิเศษเพื่อใช้ Docker-in-Docker
     command:
-    - dockerd-entrypoint.sh
-    args:
-    - --host=tcp://0.0.0.0:2375
-    - --host=unix:///var/run/docker.sock
-    env:
-    - name: DOCKER_TLS_CERTDIR
-      value: ""
-    ports:
-    - containerPort: 2375
-      hostPort: 2375
-    volumeMounts:
-    - name: docker-socket
-      mountPath: /var/run/docker.sock
-  volumes:
-  - name: docker-socket
-    hostPath:
-      path: /var/run/docker.sock
+    - cat
+    tty: true
 '''
         }
     }
     stages {
-        stage('Build Docker Image') {
-            steps {
-                container('docker') {
-                    script {
-                        // สร้าง Docker image โดยใช้ Docker-in-Docker
-                        sh 'docker build -t docker:latest .'
-                    }
-                }
-            }
-        }
-        stage('Deploy to Kubernetes') {
+        stage('Build and Deploy') {
             steps {
                 container('kubectl') {
-                    // ใช้ kubectl deploy ไปยัง Kubernetes cluster
                     sh 'kubectl apply -f deployment.yaml'
                 }
             }
-        }
-    }
-    post {
-        always {
-            cleanWs()
         }
     }
 }
