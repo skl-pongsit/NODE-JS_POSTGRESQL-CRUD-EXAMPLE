@@ -1,60 +1,32 @@
 pipeline {
-  agent {
-    kubernetes {
-      label 'dind'
-      defaultContainer 'docker'
-      yaml """
----
+    agent {
+        kubernetes {
+            yaml '''
 apiVersion: v1
 kind: Pod
-metadata:
-  labels:
-    app: jenkins
 spec:
+  serviceAccountName: jenkins-runner
   containers:
-    - name: docker
-      image: docker:latest
-      command:
-        - /bin/cat
-      tty: true
-      volumeMounts:
-        - name: dind-certs
-          mountPath: /certs
-      env:
-        - name: DOCKER_TLS_CERTDIR
-          value: /certs
-        - name: DOCKER_CERT_PATH
-          value: /certs
-        - name: DOCKER_TLS_VERIFY
-          value: 1
-        - name: DOCKER_HOST
-          value: tcp://localhost:2376
-    - name: dind
-      image: docker:dind
-      securityContext:
-        privileged: true
-      env:
-        - name: DOCKER_TLS_CERTDIR
-          value: /certs
-      volumeMounts:
-        - name: dind-storage
-          mountPath: /var/lib/docker
-        - name: dind-certs
-          mountPath: /certs
-  volumes:
-    - name: dind-storage
-      emptyDir: {}
-    - name: dind-certs
-      emptyDir: {}
-"""
+  - name: kubectl
+    image: alpine/k8s:1.29.2
+    command:
+    - sleep
+    args:
+    - 99999999
+    tty: true
+  - name: docker
+    image: registry.hub.docker.com/library/docker:dind
+    command:
+      - sh
+    args:
+      - -c
+      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
+    tty: true 
+    securityContext:
+      privileged: true
+      runAsUser: 0
+'''
+            defaultContainer 'kubectl'
+        }
     }
-  }
-  stages {
-    stage('Run Docker Things') {
-      steps {
-        sh 'printenv'
-        sh 'docker info'
-      }
-    }
-  }
 }
