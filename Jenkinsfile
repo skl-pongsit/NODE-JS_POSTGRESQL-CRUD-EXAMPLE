@@ -31,4 +31,12 @@ spec:
       defaultContainer 'kubectl'
     }
   }
+  stages {
+    stage('Run Docker Things') {
+      steps {
+        sh 'printenv'
+        sh 'docker info'
+      }
+    }
+  }
 }
