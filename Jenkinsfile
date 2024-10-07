@@ -1,7 +1,7 @@
 pipeline {
     agent {
         kubernetes {
-            yaml '''
+            yaml """
 apiVersion: v1
 kind: Pod
 spec:
@@ -25,7 +25,7 @@ spec:
     securityContext:
       privileged: true
       runAsUser: 0
-'''
+"""
             defaultContainer 'kubectl'
         }
     }
