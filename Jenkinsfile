@@ -5,7 +5,6 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-  serviceAccountName: jenkins-runner
   containers:
   - name: kubectl
     image: alpine/k8s:1.29.2
