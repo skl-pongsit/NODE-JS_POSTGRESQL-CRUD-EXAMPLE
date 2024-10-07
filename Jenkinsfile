@@ -1,42 +1,68 @@
 pipeline {
-  agent {
-    kubernetes {
-      label 'dind'
-      defaultContainer 'docker'
-      yaml """
+    agent {
+        kubernetes {
+            yaml '''
 apiVersion: v1
 kind: Pod
+metadata:
+  labels:
+    app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins
+  serviceAccountName: jenkins  # ระบุ serviceAccount ที่จะใช้
   containers:
   - name: kubectl
-    image: alpine/k8s:1.29.2
+    image: bitnami/kubectl:latest
     command:
-    - sleep
-    args:
-    - 99999999
+    - cat
     tty: true
   - name: docker
-    image: registry.hub.docker.com/library/docker:dind
-    command:
-      - sh
-    args:
-      - -c
-      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
-    tty: true 
+    image: docker:19.03.12
     securityContext:
-      privileged: true
-      runAsUser: 0
-"""
-      defaultContainer 'kubectl'
+      privileged: true  # ต้องการสิทธิพิเศษเพื่อใช้ Docker-in-Docker
+    command:
+    - dockerd-entrypoint.sh
+    args:
+    - --host=tcp://0.0.0.0:2375
+    - --host=unix:///var/run/docker.sock
+    env:
+    - name: DOCKER_TLS_CERTDIR
+      value: ""
+    ports:
+    - containerPort: 2375
+      hostPort: 2375
+    volumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-socket
+    hostPath:
+      path: /var/run/docker.sock
+'''
+        }
     }
-  }
-  stages {
-    stage('Run Docker Things') {
-      steps {
-        sh 'printenv'
-        sh 'docker info'
-      }
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                container('docker') {
+                    script {
+                        // สร้าง Docker image โดยใช้ Docker-in-Docker
+                        sh 'docker build -t docker:latest .'
+                    }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    // ใช้ kubectl deploy ไปยัง Kubernetes cluster
+                    sh 'kubectl apply -f deployment.yaml'
+                }
+            }
+        }
     }
-  }
+    post {
+        always {
+            cleanWs()
+        }
+    }
 }
