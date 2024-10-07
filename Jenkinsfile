@@ -1,6 +1,8 @@
 pipeline {
   agent {
     kubernetes {
+      label 'dind'
+      defaultContainer 'docker'
       yaml """
 apiVersion: v1
 kind: Pod
@@ -27,6 +29,14 @@ spec:
       runAsUser: 0
 """
       defaultContainer 'kubectl'
+    }
+  }
+  stages {
+    stage('Run Docker Things') {
+      steps {
+        sh 'printenv'
+        sh 'docker info'
+      }
     }
   }
 }
