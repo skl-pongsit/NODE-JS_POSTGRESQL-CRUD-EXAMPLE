@@ -16,7 +16,7 @@ spec:
     - cat
     tty: true
   - name: docker
-    image: docker:20.10-dind
+    image: docker:19.03.12-dind
     securityContext:
       privileged: true
     volumeMounts:
