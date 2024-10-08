@@ -4,54 +4,68 @@ pipeline {
             yaml '''
 apiVersion: v1
 kind: Pod
+metadata:
+  labels:
+    app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins
+  serviceAccountName: jenkins-runner
   containers:
   - name: kubectl
-    image: alpine/k8s:1.29.2
+    image: bitnami/kubectl:latest
     command:
-    - sleep
-    args:
-    - 99999999
+    - cat
     tty: true
   - name: docker
-    image: registry.hub.docker.com/library/docker:dind
-    command:
-      - sh
-    args:
-      - -c
-      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
-    tty: true 
+    image: docker:20.10-dind
     securityContext:
       privileged: true
-      runAsUser: 0
+    volumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+    - name: docker-storage
+      mountPath: /var/lib/docker
+  volumes:
+  - name: docker-socket
+    emptyDir: {}
+  - name: docker-storage
+    emptyDir: {}
 '''
-            defaultContainer 'kubectl'
         }
     }
+
     stages {
         stage('Build Docker Image') {
             steps {
                 container('docker') {
                     script {
-                        // สร้าง Docker image โดยใช้ Docker-in-Docker
-                        sh 'docker build -t your-docker-image:latest .'
+                        // Build Docker image
+                        sh 'docker build -t my-app-image:latest .'
                     }
                 }
             }
         }
-        stage('Deploy to Kubernetes') {
+
+        stage('Push Docker Image') {
             steps {
-                container('kubectl') {
-                    // ใช้ kubectl deploy ไปยัง Kubernetes cluster
-                    sh 'kubectl apply -f deployment.yaml'
+                container('docker') {
+                    script {
+                        // Push Docker image to a registry
+                        sh 'docker tag my-app-image:latest registry.hub.docker.com/library/docker:dind/my-app-image:latest'
+                        sh 'docker push registry.hub.docker.com/library/docker:dind/my-app-image:latest'
+                    }
                 }
             }
         }
-    }
-    post {
-        always {
-            cleanWs()
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    script {
+                        // Apply Kubernetes manifests
+                        sh 'kubectl apply -f deployment.yaml'
+                    }
+                }
+            }
         }
     }
 }
