@@ -8,8 +8,9 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    jenkins-agent: kubernetes
+    app: jenkins-pipeline
 spec:
+  serviceAccountName: jenkins
   containers:
   - name: kubectl
     image: bitnami/kubectl:latest
@@ -17,25 +18,29 @@ spec:
     - cat
     tty: true
   - name: docker
-    image: docker:19.03.12
-    command:
-    - cat
-    tty: true
+    image: docker:19.03.12-dind
+    securityContext:
+      privileged: true
     volumeMounts:
     - name: docker-socket
       mountPath: /var/run/docker.sock
+    - name: docker-storage
+      mountPath: /var/lib/docker
   volumes:
   - name: docker-socket
-    hostPath:
-      path: /var/run/docker.sock
+    emptyDir: {}
+  - name: docker-storage
+    emptyDir: {}
 """
         }
     }
+
     environment {
-        REGISTRY = 'docker.io/sklpongsit'
-        IMAGE_NAME = 'your-image-name'
-        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials' // Docker credentials in Jenkins
+        REGISTRY = 'docker.io/sklpongsit' // แทนที่ด้วย Docker registry ของคุณ
+        IMAGE_NAME = 'your-image-name' // แทนที่ด้วยชื่อ image ของคุณ
+        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials' // ID ของ Docker credentials ใน Jenkins
     }
+
     stages {
         stage('Checkout') {
             steps {
