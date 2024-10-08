@@ -8,7 +8,7 @@ metadata:
   labels:
     app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins-runner
+  serviceAccountName: jenkins
   containers:
   - name: kubectl
     image: bitnami/kubectl:latest
