@@ -16,7 +16,7 @@ spec:
     - cat
     tty: true
   - name: docker
-    image: docker:dind
+    image: docker:19.03.12
     securityContext:
       privileged: true  # ต้องการสิทธิพิเศษเพื่อใช้ Docker-in-Docker
     command:
