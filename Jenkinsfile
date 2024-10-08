@@ -4,40 +4,29 @@ pipeline {
             yaml '''
 apiVersion: v1
 kind: Pod
-metadata:
-  labels:
-    app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins  # ระบุ serviceAccount ที่จะใช้
+  serviceAccountName: jenkins
   containers:
   - name: kubectl
-    image: bitnami/kubectl:latest
+    image: alpine/k8s:1.29.2
     command:
-    - cat
+    - sleep
+    args:
+    - 99999999
     tty: true
   - name: docker
-    image: docker:19.03.12
-    securityContext:
-      privileged: true  # ต้องการสิทธิพิเศษเพื่อใช้ Docker-in-Docker
+    image: registry.hub.docker.com/library/docker:dind
     command:
-    - dockerd-entrypoint.sh
+      - sh
     args:
-    - --host=tcp://0.0.0.0:2375
-    - --host=unix:///var/run/docker.sock
-    env:
-    - name: DOCKER_TLS_CERTDIR
-      value: ""
-    ports:
-    - containerPort: 2375
-      hostPort: 2375
-    volumeMounts:
-    - name: docker-socket
-      mountPath: /var/run/docker.sock
-  volumes:
-  - name: docker-socket
-    hostPath:
-      path: /var/run/docker.sock
+      - -c
+      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
+    tty: true 
+    securityContext:
+      privileged: true
+      runAsUser: 0
 '''
+            defaultContainer 'kubectl'
         }
     }
     stages {
