@@ -1,14 +1,15 @@
 pipeline {
     agent {
         kubernetes {
-            yaml '''
+            label 'jenkins-k8s-agent'
+            defaultContainer 'jnlp'
+            yaml """
 apiVersion: v1
 kind: Pod
 metadata:
   labels:
-    app: jenkins-pipeline
+    jenkins-agent: kubernetes
 spec:
-  serviceAccountName: jenkins
   containers:
   - name: kubectl
     image: bitnami/kubectl:latest
@@ -16,56 +17,73 @@ spec:
     - cat
     tty: true
   - name: docker
-    image: docker:19.03.12-dind
-    securityContext:
-      privileged: true
+    image: docker:19.03.12
+    command:
+    - cat
+    tty: true
     volumeMounts:
     - name: docker-socket
       mountPath: /var/run/docker.sock
-    - name: docker-storage
-      mountPath: /var/lib/docker
   volumes:
   - name: docker-socket
-    emptyDir: {}
-  - name: docker-storage
-    emptyDir: {}
-'''
+    hostPath:
+      path: /var/run/docker.sock
+"""
         }
     }
-
+    environment {
+        REGISTRY = 'docker.io/sklpongsit'
+        IMAGE_NAME = 'your-image-name'
+        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials'
+    }
+    stage('Login to Docker') {
+    steps {
+        container('docker') {
+            script {
+                withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+                }
+            }
+        }
+    }
+}
     stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/rtyler/14a43e3c2c21d876d3f6315b1e82bc25.git', branch: 'master'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 container('docker') {
                     script {
-                        // Build Docker image
-                        sh 'docker build -t my-app-image:latest .'
+                        sh 'docker build -t $REGISTRY/$IMAGE_NAME:latest .'
                     }
                 }
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 container('docker') {
                     script {
-                        // Push Docker image to a registry
-                        sh 'docker tag my-app-image:latest registry.hub.docker.com/library/docker:dind/my-app-image:latest'
-                        sh 'docker push registry.hub.docker.com/library/docker:dind/my-app-image:latest'
+                        sh 'docker push $REGISTRY/$IMAGE_NAME:latest'
                     }
                 }
             }
         }
-
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
                     script {
-                        // Apply Kubernetes manifests
-                        sh 'kubectl apply -f deployment.yaml'
+                        sh 'kubectl apply -f kubernetes/deployment.yaml --kubeconfig=$KUBECONFIG'
                     }
                 }
             }
+        }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
