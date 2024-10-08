@@ -8,7 +8,7 @@ metadata:
   labels:
     app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins-runner  # ระบุ serviceAccount ที่จะใช้
+  serviceAccountName: jenkins  # ระบุ serviceAccount ที่จะใช้
   containers:
   - name: kubectl
     image: bitnami/kubectl:latest
