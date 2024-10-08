@@ -34,25 +34,27 @@ spec:
     environment {
         REGISTRY = 'docker.io/sklpongsit'
         IMAGE_NAME = 'your-image-name'
-        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials'
+        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials' // Docker credentials in Jenkins
     }
-    stage('Login to Docker') {
-    steps {
-        container('docker') {
-            script {
-                withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
-                    sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
-                }
-            }
-        }
-    }
-}
     stages {
         stage('Checkout') {
             steps {
                 git url: 'https://github.com/rtyler/14a43e3c2c21d876d3f6315b1e82bc25.git', branch: 'master'
             }
         }
+
+        stage('Login to Docker') {
+            steps {
+                container('docker') {
+                    script {
+                        withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                            sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 container('docker') {
@@ -62,6 +64,7 @@ spec:
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 container('docker') {
@@ -71,6 +74,7 @@ spec:
                 }
             }
         }
+
         stage('Deploy to Kubernetes') {
             steps {
                 container('kubectl') {
@@ -81,6 +85,7 @@ spec:
             }
         }
     }
+
     post {
         always {
             cleanWs()
