@@ -1,68 +1,45 @@
 pipeline {
-    agent {
-        kubernetes {
-            yaml '''
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: jenkins-pipeline
-spec:
-  serviceAccountName: jenkins
-  containers:
-  - name: kubectl
-    image: bitnami/kubectl:latest
-    command:
-    - cat
-    tty: true
-  - name: docker
-    image: docker:19.03.12-dind
-    securityContext:
-      privileged: true
-    volumeMounts:
-    - name: docker-socket
-      mountPath: /var/run/docker.sock
-    - name: docker-storage
-      mountPath: /var/lib/docker
-  volumes:
-  - name: docker-socket
-    emptyDir: {}
-  - name: docker-storage
-    emptyDir: {}
-'''
-        }
+  agent {
+    kubernetes {
+      yaml '''
+        apiVersion: v1
+        kind: Pod
+        spec:
+          containers:
+          - name: maven
+            image: maven:alpine
+            command:
+            - cat
+            tty: true
+          - name: docker
+            image: docker:latest
+            command:
+            - cat
+            tty: true
+            volumeMounts:
+             - mountPath: /var/run/docker.sock
+               name: docker-sock
+          volumes:
+          - name: docker-sock
+            hostPath:
+              path: /var/run/docker.sock    
+        '''
     }
-    stages {
-        stage('Build Docker Image') {
-            steps {
-                container('docker') {
-                    script {
-                        // Build Docker image
-                        sh 'docker build -t poc-app:latest .'
-                    }
-                }
-            }
+  }
+  stages {
+    stage('Clone') {
+      steps {
+        container('maven') {
+          git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
         }
-        stage('Push Docker Image') {
-            steps {
-                container('docker') {
-                    script {
-                        // Push Docker image to a registry
-                        sh 'docker tag poc-app:latest registry.hub.docker.com/library/docker:dind/poc-app:latest'
-                        sh 'docker push registry.hub.docker.com/library/docker:dind/poc-app:latest'
-                    }
-                }
-            }
+      }
+    }  
+    stage('Build-Jar-file') {
+      steps {
+        container('maven') {
+          sh 'mvn package'
         }
-        stage('Deploy to Kubernetes') {
-            steps {
-                container('kubectl') {
-                    script {
-                        // Apply Kubernetes manifests
-                        sh 'kubectl apply -f deployment.yaml'
-                    }
-                }
-            }
-        }
+      }
     }
+  }
 }
