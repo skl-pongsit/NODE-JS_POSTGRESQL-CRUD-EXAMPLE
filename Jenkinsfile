@@ -47,6 +47,8 @@ spec:
                         def TOKEN = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token', returnStdout: true).trim()
                         def KUBE_API = 'https://kubernetes.default.svc.cluster.local'
                         def SA = 'jenkins-runner'
+
+                        sh 'ls -la'
                     }
                 }
             }
