@@ -5,7 +5,7 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-  serviceAccountName: jenkins
+  serviceAccountName: jenkins-runner
   containers:
   - name: kubectl
     image: alpine/k8s:1.29.2
@@ -36,4 +36,20 @@ spec:
         GIT_HASH = GIT_COMMIT.take(7)
         application_name = "poc-application"
     }
+     stages {
+        stage('Prepare') {
+            steps {
+                container('kubectl') {
+                    script{
+                      
+                        // Set environment variables
+                        def NAMESPACE = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/namespace', returnStdout: true).trim()
+                        def TOKEN = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token', returnStdout: true).trim()
+                        def KUBE_API = 'https://kubernetes.default.svc.cluster.local'
+                        def SA = 'jenkins-runner'
+                    }
+                }
+            }
+        }
+    }            
 }
