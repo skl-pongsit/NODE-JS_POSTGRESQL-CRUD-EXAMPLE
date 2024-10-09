@@ -4,54 +4,64 @@ pipeline {
             yaml '''
 apiVersion: v1
 kind: Pod
+metadata:
+  labels:
+    app: jenkins-pipeline
 spec:
-  serviceAccountName: jenkins-runner
+  serviceAccountName: jenkins
   containers:
   - name: kubectl
-    image: alpine/k8s:1.29.2
+    image: bitnami/kubectl:latest
     command:
-    - sleep
-    args:
-    - 99999999
+    - cat
     tty: true
   - name: docker
-    image: registry.hub.docker.com/library/docker:dind
-    command:
-      - sh
-    args:
-      - -c
-      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
-    tty: true 
+    image: docker:19.03.12-dind
     securityContext:
       privileged: true
-      runAsUser: 0
+    volumeMounts:
+    - name: docker-socket
+      mountPath: /var/run/docker.sock
+    - name: docker-storage
+      mountPath: /var/lib/docker
+  volumes:
+  - name: docker-socket
+    emptyDir: {}
+  - name: docker-storage
+    emptyDir: {}
 '''
-            defaultContainer 'kubectl'
         }
     }
-
-    environment {
-        dockerImage = ''
-        ns_deploy = ''
-        GIT_HASH = GIT_COMMIT.take(7)
-        application_name = "poc-application"
-    }
-     stages {
-        stage('Prepare') {
+    stages {
+        stage('Build Docker Image') {
             steps {
-                container('kubectl') {
-                    script{
-                      
-                        // Set environment variables
-                        def NAMESPACE = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/namespace', returnStdout: true).trim()
-                        def TOKEN = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token', returnStdout: true).trim()
-                        def KUBE_API = 'https://kubernetes.default.svc.cluster.local'
-                        def SA = 'jenkins-runner'
-
-                        sh 'ls -la'
+                container('docker') {
+                    script {
+                        // Build Docker image
+                        sh 'docker build -t poc-app:latest .'
                     }
                 }
             }
         }
-    }            
-}
+        stage('Push Docker Image') {
+            steps {
+                container('docker') {
+                    script {
+                        // Push Docker image to a registry
+                        sh 'docker tag poc-app:latest registry.hub.docker.com/library/docker:dind/poc-app:latest'
+                        sh 'docker push registry.hub.docker.com/library/docker:dind/poc-app:latest'
+                    }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            steps {
+                container('kubectl') {
+                    script {
+                        // Apply Kubernetes manifests
+                        sh 'kubectl apply -f deployment.yaml'
+                    }
+                }
+            }
+        }
+    }
