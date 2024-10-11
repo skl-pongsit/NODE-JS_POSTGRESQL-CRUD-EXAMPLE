@@ -54,15 +54,30 @@ pipeline {
     //     }
     //   }
     // }
-    stage('Login-Into-Docker') {
-      steps {
-        container('docker') {
-        //   sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
-        sh 'echo $DOCKER_USERNAME'
-        sh 'echo $DOCKER_PASSWORD'
-       }
-      }
+    stages {
+        stage('Use Credentials') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
+                        usernameVariable: 'USERNAME', 
+                        passwordVariable: 'PASSWORD')]) {
+                        // Now you can use the USERNAME and PASSWORD environment variables
+                        sh 'echo Username: $USERNAME'
+                        sh 'echo Password: $PASSWORD'
+                    }
+                }
+            }
+        }
     }
+    // stage('Login-Into-Docker') {
+    //   steps {
+    //     container('docker') {
+    //     //   sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+    //     sh 'echo $DOCKER_USERNAME'
+    //     sh 'echo $DOCKER_PASSWORD'
+    //    }
+    //   }
+    // }
     //  stage('Push-Images-Docker-to-DockerHub') {
     //   steps {
     //     container('docker') {
