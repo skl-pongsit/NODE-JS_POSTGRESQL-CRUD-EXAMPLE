@@ -31,21 +31,21 @@ pipeline {
         DOCKER_PASSWORD = credentials('docker-password')
         REGISTRY = 'https://hub.docker.com/repository/docker/sklpongsit/poc-ci-cd/'
     }
-  stages {
-    // stage('Clone') {
-    //   steps {
-    //     container('maven') {
-    //       git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
-    //     }
-    //   }
-    // }  
-    // stage('Build-Jar-file') {
-    //   steps {
-    //     container('maven') {
-    //       sh 'mvn package'
-    //     }
-    //   }
-    }
+//   stages {
+//     stage('Clone') {
+//       steps {
+//         container('maven') {
+//           git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
+//         }
+//       }
+//     }  
+//     stage('Build-Jar-file') {
+//       steps {
+//         container('maven') {
+//           sh 'mvn package'
+//         }
+//       }
+//     }
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
@@ -73,5 +73,5 @@ pipeline {
         container('docker') {
           sh 'docker logout'
       }
-      }
     }
+}
