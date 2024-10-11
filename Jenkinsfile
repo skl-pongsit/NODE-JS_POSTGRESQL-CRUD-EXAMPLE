@@ -27,9 +27,9 @@ pipeline {
     }
   }
   environment {
-        DOCKER_USERNAME = credentials('docker-username')
-        DOCKER_PASSWORD = credentials('docker-username')
-        REGISTRY = 'https://hub.docker.com/repository/docker/sklpongsit/poc-ci-cd/'
+        DOCKER_USERNAME = credentials('docker-registry-credentials')
+        DOCKER_PASSWORD = credentials('docker-registry-credentials')
+        REGISTRY = 'https://index.docker.io/v1/'
     }
   stages {
 //     stage('Clone') {
