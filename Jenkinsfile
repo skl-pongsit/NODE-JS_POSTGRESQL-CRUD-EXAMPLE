@@ -30,6 +30,7 @@ pipeline {
         DOCKER_USERNAME = credentials('docker-registry-credentials')
         DOCKER_PASSWORD = credentials('docker-registry-credentials')
         REGISTRY = 'https://index.docker.io/v1/'
+        IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
 //     stage('Clone') {
@@ -46,34 +47,34 @@ pipeline {
 //         }
 //       }
 //     }
-    stage('Build-Docker-Image') {
-      steps {
-        container('docker') {
-          sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
-        }
-      }
-    }
+    // stage('Build-Docker-Image') {
+    //   steps {
+    //     container('docker') {
+    //       sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
+    //     }
+    //   }
+    // }
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
-          sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
-          sh 'ls -la'
+        //   sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+        sh 'echo $DOCKER_USERNAME'
        }
       }
     }
-     stage('Push-Images-Docker-to-DockerHub') {
-      steps {
-        container('docker') {
-          sh 'docker push sklpongsit/poc-ci-cd:latest'
-        }
-      }
-    }
+    //  stage('Push-Images-Docker-to-DockerHub') {
+    //   steps {
+    //     container('docker') {
+    //       sh 'docker push sklpongsit/poc-ci-cd:latest'
+    //     }
+    //   }
+    // }
   }
-    post {
-      always {
-        container('docker') {
-          sh 'docker logout'
-      }
-    }
-  }
-}
+//     post {
+//       always {
+//         container('docker') {
+//           sh 'docker logout'
+//       }
+//     }
+//   }
+// }
