@@ -28,7 +28,7 @@ pipeline {
   }
   environment {
         DOCKER_USERNAME = credentials('docker-username')
-        DOCKER_PASSWORD = credentials('docker-password')
+        DOCKER_PASSWORD = credentials('docker-username')
         REGISTRY = 'https://hub.docker.com/repository/docker/sklpongsit/poc-ci-cd/'
     }
   stages {
