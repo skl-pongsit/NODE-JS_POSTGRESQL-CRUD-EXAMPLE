@@ -31,7 +31,7 @@ pipeline {
         DOCKER_PASSWORD = credentials('docker-password')
         REGISTRY = 'https://hub.docker.com/repository/docker/sklpongsit/poc-ci-cd/'
     }
-//   stages {
+  stages {
 //     stage('Clone') {
 //       steps {
 //         container('maven') {
@@ -49,7 +49,7 @@ pipeline {
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
-          sh 'docker build -t poc-app/testing-image:latest.'
+          sh 'docker build -t poc-app/testing-image:latest .'
         }
       }
     }
@@ -64,9 +64,9 @@ pipeline {
       steps {
         container('docker') {
           sh 'docker push poc-app/testing-image:latest'
+        }
       }
     }
-     }
   }
     post {
       always {
@@ -74,4 +74,5 @@ pipeline {
           sh 'docker logout'
       }
     }
+  }
 }
