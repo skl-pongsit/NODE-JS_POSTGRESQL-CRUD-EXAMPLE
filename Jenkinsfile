@@ -27,28 +27,29 @@ pipeline {
     }
   }
   environment {
-        REGISTRY = 'docker.io/sklpongsit' 
-        REGISTRY_CREDENTIALS_ID = 'docker-registry-credentials' 
+        DOCKER_USERNAME = credentials('docker-username')
+        DOCKER_PASSWORD = credentials('docker-password')
+        REGISTRY = 'https://hub.docker.com/repository/docker/sklpongsit/poc-ci-cd/'
     }
   stages {
-    stage('Clone') {
-      steps {
-        container('maven') {
-          git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
-        }
-      }
-    }  
-    stage('Build-Jar-file') {
-      steps {
-        container('maven') {
-          sh 'mvn package'
-        }
-      }
+    // stage('Clone') {
+    //   steps {
+    //     container('maven') {
+    //       git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
+    //     }
+    //   }
+    // }  
+    // stage('Build-Jar-file') {
+    //   steps {
+    //     container('maven') {
+    //       sh 'mvn package'
+    //     }
+    //   }
     }
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
-          sh 'docker build -t ss69261/testing-image:latest .'
+          sh 'docker build -t poc-app/testing-image:latest.'
         }
       }
     }
@@ -56,13 +57,13 @@ pipeline {
       steps {
         container('docker') {
           sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+       }
       }
-    }
     }
      stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          sh 'docker push ss69261/testing-image:latest'
+          sh 'docker push poc-app/testing-image:latest'
       }
     }
      }
@@ -74,4 +75,3 @@ pipeline {
       }
       }
     }
-}
