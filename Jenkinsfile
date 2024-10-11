@@ -49,7 +49,7 @@ pipeline {
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
-          sh 'docker build -t poc-app/testing-image:latest .'
+          sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
         }
       }
     }
@@ -64,7 +64,7 @@ pipeline {
      stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          sh 'docker push poc-app/testing-image:latest'
+          sh 'docker push sklpongsit/poc-ci-cd:latest'
         }
       }
     }
