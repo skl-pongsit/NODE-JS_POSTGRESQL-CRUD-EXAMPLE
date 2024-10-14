@@ -52,7 +52,8 @@ pipeline {
         container('docker') {
         // sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
         // sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin $REGISTRY'
-        sh 'ls -la'
+        sh 'echo Username: $DOCKER_USERNAME'
+        sh 'echo Password: $DOCKER_PASSWORD'
        }
       }
     }
@@ -67,11 +68,8 @@ pipeline {
      stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          // sh 'docker push $REGISTRY/sklpongsit/poc-ci-cd:latest'
-          // sh 'echo Username: $USERNAME'
-          // sh 'echo Password: $PASSWORD'
-          withDockerRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
-        bat "docker push sklpongsit/poc-ci-cd:latest"
+          sh 'docker push $REGISTRY/sklpongsit/poc-ci-cd:latest'
+         
         }
       }
     }
@@ -83,15 +81,7 @@ pipeline {
   //     }
   //   }
   // }
- }
 }
-//     stage('Clone') {
-//       steps {
-//         container('maven') {
-//           git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
-//         }
-//       }
-//     }  
 //     stage('Build-Jar-file') {
 //       steps {
 //         container('maven') {
