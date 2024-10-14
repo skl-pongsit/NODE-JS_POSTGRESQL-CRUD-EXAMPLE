@@ -33,7 +33,6 @@ pipeline {
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
-    stages {
         stage('Use Credentials') {
             steps {
                 script {
@@ -47,7 +46,6 @@ pipeline {
                 }
             }
         }
-    }
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
