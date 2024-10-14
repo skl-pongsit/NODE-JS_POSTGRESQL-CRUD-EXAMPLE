@@ -34,19 +34,19 @@ pipeline {
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
-        stage('Use Credentials') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
-                        usernameVariable: 'USERNAME', 
-                        passwordVariable: 'PASSWORD')]) {
-                        // Now you can use the USERNAME and PASSWORD environment variables
-                        sh 'echo Username: $USERNAME'
-                        sh 'echo Password: $PASSWORD'
-                    }
-                }
-            }
-        }
+        // stage('Use Credentials') {
+        //     steps {
+        //         script {
+        //             withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
+        //                 usernameVariable: 'USERNAME', 
+        //                 passwordVariable: 'PASSWORD')]) {
+        //                 // Now you can use the USERNAME and PASSWORD environment variables
+        //                 sh 'echo Username: $USERNAME'
+        //                 sh 'echo Password: $PASSWORD'
+        //             }
+        //         }
+        //     }
+        // }
         stage('Setup Credentials') {
             steps {
                 script {
