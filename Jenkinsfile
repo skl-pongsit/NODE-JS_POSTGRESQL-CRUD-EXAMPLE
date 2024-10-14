@@ -67,6 +67,8 @@ pipeline {
       steps {
         container('docker') {
           sh 'docker push sklpongsit/poc-ci-cd:latest'
+          sh 'echo Username: $USERNAME'
+          sh 'echo Password: $PASSWORD'
         }
       }
     }
