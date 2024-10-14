@@ -28,29 +28,38 @@ pipeline {
   }
   environment {
         // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
-        DOCKER_USERNAME = credentials('docker-registry-credentials')
-        DOCKER_PASSWORD = credentials('docker-registry-credentials')
+        // DOCKER_USERNAME = credentials('docker-registry-credentials')
+        // DOCKER_PASSWORD = credentials('docker-registry-credentials')
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
-        stage('Use Credentials') {
+        // stage('Use Credentials') {
+        //     steps {
+        //         script {
+        //             withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
+        //                 usernameVariable: 'USERNAME', 
+        //                 passwordVariable: 'PASSWORD')]) {
+        //                 // Now you can use the USERNAME and PASSWORD environment variables
+        //                 sh 'echo Username: $USERNAME'
+        //                 sh 'echo Password: $PASSWORD'
+        //             }
+        //         }
+        //     }
+        // }
+        stage('Setup Credentials') {
             steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
-                        usernameVariable: 'USERNAME', 
-                        passwordVariable: 'PASSWORD')]) {
-                        // Now you can use the USERNAME and PASSWORD environment variables
-                        sh 'echo Username: $USERNAME'
-                        sh 'echo Password: $PASSWORD'
-                    }
+                // ใช้ withCredentials เพื่อดึงค่า credentials
+                withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    // คุณสามารถใช้ตัวแปร DOCKER_USERNAME และ DOCKER_PASSWORD ได้ที่นี่
+                    echo "Using Docker Username: $DOCKER_USERNAME"
                 }
             }
         }
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
-        sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
+        // sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
         // sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
         sh 'echo Username: $DOCKER_USERNAME'
         sh 'echo Password: $DOCKER_PASSWORD'
