@@ -59,7 +59,7 @@ pipeline {
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
-          sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
+          sh 'docker build -t $REGISTRY/sklpongsit/poc-ci-cd:latest .'
         }
       }
     }
@@ -67,7 +67,7 @@ pipeline {
      stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          sh 'docker push sklpongsit/poc-ci-cd:latest'
+          sh 'docker push $REGISTRY/sklpongsit/poc-ci-cd:latest'
           sh 'echo Username: $USERNAME'
           sh 'echo Password: $PASSWORD'
         }
