@@ -27,10 +27,10 @@ pipeline {
     }
   }
   environment {
-        DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
-        // DOCKER_USERNAME = credentials('docker-registry-credentials')
-        // DOCKER_PASSWORD = credentials('docker-registry-credentials')
-        REGISTRY = 'https://index.docker.io/v1/'
+        // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
+        DOCKER_USERNAME = credentials('docker-registry-credentials').username
+        DOCKER_PASSWORD = credentials('docker-registry-credentials').password
+        REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
@@ -51,7 +51,7 @@ pipeline {
       steps {
         container('docker') {
         // sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
-        sh 'echo $DOCKER_CREDENTIALS_PSW | docker login -u $DOCKER_CREDENTIALS_USR --password-stdin'
+        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
         sh 'DOCKER_CREDENTIALS_USR'
        }
       }
