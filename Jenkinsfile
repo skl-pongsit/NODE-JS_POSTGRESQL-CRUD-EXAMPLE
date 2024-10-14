@@ -86,10 +86,10 @@ pipeline {
         }
       }
     }
-    post {
-      always {
-        container('docker') {
-          sh 'docker logout'
-      }
-    }
-  }
+  //   post {
+  //     always {
+  //       container('docker') {
+  //         sh 'docker logout'
+  //     }
+  //   }
+  // }
