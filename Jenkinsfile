@@ -28,8 +28,8 @@ pipeline {
   }
   environment {
         // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
-        DOCKER_USERNAME = credentials('docker-credentials').username
-        DOCKER_PASSWORD = credentials('docker-credentials').password
+        // DOCKER_USERNAME = credentials('docker-credentials')
+        // DOCKER_PASSWORD = credentials('docker-credentials')
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
@@ -44,6 +44,15 @@ pipeline {
                         sh 'echo Username: $USERNAME'
                         sh 'echo Password: $PASSWORD'
                     }
+                }
+            }
+        }
+        stage('Setup Credentials') {
+            steps {
+                script {
+                    // ใช้ script block เพื่อดึงค่า credentials
+                    DOCKER_USERNAME = credentials('docker-credentials').username
+                    DOCKER_PASSWORD = credentials('docker-credentials').password
                 }
             }
         }
