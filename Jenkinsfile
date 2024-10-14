@@ -67,9 +67,11 @@ pipeline {
      stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          sh 'docker push $REGISTRY/sklpongsit/poc-ci-cd:latest'
-          sh 'echo Username: $USERNAME'
-          sh 'echo Password: $PASSWORD'
+          // sh 'docker push $REGISTRY/sklpongsit/poc-ci-cd:latest'
+          // sh 'echo Username: $USERNAME'
+          // sh 'echo Password: $PASSWORD'
+          withDockerRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
+        bat "docker push sklpongsit/poc-ci-cd:latest"
         }
       }
     }
