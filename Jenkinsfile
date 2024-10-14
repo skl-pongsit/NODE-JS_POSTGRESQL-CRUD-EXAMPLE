@@ -56,22 +56,7 @@ pipeline {
       }
     }
   }
-}
-//     stage('Clone') {
-//       steps {
-//         container('maven') {
-//           git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
-//         }
-//       }
-//     }  
-//     stage('Build-Jar-file') {
-//       steps {
-//         container('maven') {
-//           sh 'mvn package'
-//         }
-//       }
-//     }
-    stage('Build-Docker-Image') {
+      stage('Build-Docker-Image') {
       steps {
         container('docker') {
           sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
@@ -93,3 +78,18 @@ pipeline {
   //     }
   //   }
   // }
+}
+//     stage('Clone') {
+//       steps {
+//         container('maven') {
+//           git branch: 'main', changelog: false, poll: false, url: 'https://github.com/skl-pongsit/NODE-JS_POSTGRESQL-CRUD-EXAMPLE.git'
+//         }
+//       }
+//     }  
+//     stage('Build-Jar-file') {
+//       steps {
+//         container('maven') {
+//           sh 'mvn package'
+//         }
+//       }
+//     }
