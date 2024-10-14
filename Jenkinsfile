@@ -71,27 +71,25 @@ pipeline {
 //         }
 //       }
 //     }
-    // stage('Build-Docker-Image') {
-    //   steps {
-    //     container('docker') {
-    //       sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
-    //     }
-    //   }
-    // }
+    stage('Build-Docker-Image') {
+      steps {
+        container('docker') {
+          sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
+        }
+      }
+    }
     
-    //  stage('Push-Images-Docker-to-DockerHub') {
-    //   steps {
-    //     container('docker') {
-    //       sh 'docker push sklpongsit/poc-ci-cd:latest'
-    //     }
-    //   }
-    // }
-//   }
-// }
-//     post {
-//       always {
-//         container('docker') {
-//           sh 'docker logout'
-//       }
-//     }
-//   }
+     stage('Push-Images-Docker-to-DockerHub') {
+      steps {
+        container('docker') {
+          sh 'docker push sklpongsit/poc-ci-cd:latest'
+        }
+      }
+    }
+    post {
+      always {
+        container('docker') {
+          sh 'docker logout'
+      }
+    }
+  }
