@@ -50,8 +50,8 @@ pipeline {
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
-        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD --password-stdin $REGISTRY'
-        // sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+        // sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
         sh 'ls -la'
        }
       }
