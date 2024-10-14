@@ -30,7 +30,7 @@ pipeline {
         // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
         DOCKER_USERNAME = credentials('docker-registry-credentials')
         DOCKER_PASSWORD = credentials('docker-registry-credentials')
-        REGISTRY = 'https://registry-1.docker.io/v2/'
+        REGISTRY = 'https://registry-1.docker.io/v1/'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
   stages {
