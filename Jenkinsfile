@@ -51,7 +51,7 @@ pipeline {
       steps {
         container('docker') {
         // sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
-        sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
+        sh 'echo $DOCKER_PASSWORD_USR | docker login -u $DOCKER_USERNAME_USR --password-stdin'
         sh 'ls -la'
        }
       }
