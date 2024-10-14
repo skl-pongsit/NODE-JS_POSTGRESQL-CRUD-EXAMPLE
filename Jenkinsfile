@@ -28,8 +28,8 @@ pipeline {
   }
   environment {
         // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
-        DOCKER_USERNAME = credentials('docker-credentials')
-        DOCKER_PASSWORD = credentials('docker-credentials')
+        DOCKER_USERNAME = credentials('docker-registry-credentials')
+        DOCKER_PASSWORD = credentials('docker-registry-credentials')
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
     }
