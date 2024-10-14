@@ -46,15 +46,15 @@ pipeline {
                 }
             }
         }
-    // stage('Login-Into-Docker') {
-    //   steps {
-    //     container('docker') {
-    //     sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
-    //     sh 'echo $DOCKER_USERNAME'
-    //     sh 'echo $DOCKER_PASSWORD'
-    //    }
-    //   }
-    // }
+    stage('Login-Into-Docker') {
+      steps {
+        container('docker') {
+        sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+        sh 'echo $DOCKER_USERNAME'
+        sh 'echo $DOCKER_PASSWORD'
+       }
+      }
+    }
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
