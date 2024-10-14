@@ -55,8 +55,7 @@ pipeline {
        }
       }
     }
-  }
-      stage('Build-Docker-Image') {
+    stage('Build-Docker-Image') {
       steps {
         container('docker') {
           sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
@@ -71,6 +70,7 @@ pipeline {
         }
       }
     }
+  } 
   //   post {
   //     always {
   //       container('docker') {
