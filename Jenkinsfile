@@ -52,7 +52,6 @@ pipeline {
         container('docker') {
         // sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
         sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-        sh 'DOCKER_CREDENTIALS_USR'
        }
       }
     }
