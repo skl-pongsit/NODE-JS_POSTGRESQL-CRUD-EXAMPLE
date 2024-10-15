@@ -35,7 +35,6 @@ pipeline {
         steps {
         // ใช้ withCredentials เพื่อดึงค่า credentials
         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-          // คุณสามารถใช้ตัวแปร DOCKER_USERNAME และ DOCKER_PASSWORD ได้ที่นี่
           echo "Using Docker Username: $DOCKER_USERNAME"
           echo 'Using Docker Username: $DOCKER_USERNAME'
         }
@@ -44,12 +43,10 @@ pipeline {
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
+          // ใช้ withCredentials เพื่อดึงค่า credentials
           withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-            sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+            sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY' //ใช้ตัวแปร DOCKER_USERNAME และ DOCKER_PASSWORD ได้ที่นี่
           }
-          // sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-          sh 'echo Username: $DOCKER_USERNAME'
-          sh 'echo Password: $DOCKER_PASSWORD'
         }
       }
     }
