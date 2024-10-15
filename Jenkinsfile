@@ -22,79 +22,51 @@ pipeline {
           volumes:
           - name: docker-sock
             hostPath:
-              path: /var/run/docker.sock    
+              path: /var/run/docker.sock
         '''
     }
   }
   environment {
-        // DOCKER_CREDENTIALS = credentials('docker-registry-credentials')
-        // DOCKER_USERNAME = credentials('docker-registry-credentials')
-        // DOCKER_PASSWORD = credentials('docker-registry-credentials')
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
-    }
+  }
   stages {
-        // stage('Use Credentials') {
-        //     steps {
-        //         script {
-        //             withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', 
-        //                 usernameVariable: 'USERNAME', 
-        //                 passwordVariable: 'PASSWORD')]) {
-        //                 // Now you can use the USERNAME and PASSWORD environment variables
-        //                 sh 'echo Username: $USERNAME'
-        //                 sh 'echo Password: $PASSWORD'
-        //             }
-        //         }
-        //     }
-        // }
-        stage('Setup Credentials') {
-            steps {
-                // ใช้ withCredentials เพื่อดึงค่า credentials
-                withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    // คุณสามารถใช้ตัวแปร DOCKER_USERNAME และ DOCKER_PASSWORD ได้ที่นี่
-                    echo "Using Docker Username: $DOCKER_USERNAME"
-                }
-            }
+      stage('Setup Credentials') {
+        steps {
+        // ใช้ withCredentials เพื่อดึงค่า credentials
+        withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+          // คุณสามารถใช้ตัวแปร DOCKER_USERNAME และ DOCKER_PASSWORD ได้ที่นี่
+          echo "Using Docker Username: $DOCKER_USERNAME"
+          echo 'Using Docker Username: $DOCKER_USERNAME'
+        }
+      }
         }
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
-        // sh 'docker login -u $USERNAME -p $PASSWORD $REGISTRY'
-        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-        sh 'echo Username: $DOCKER_USERNAME'
-        sh 'echo Password: $DOCKER_PASSWORD'
-       }
+          withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+            sh 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY'
+          }
+          // sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+          sh 'echo Username: $DOCKER_USERNAME'
+          sh 'echo Password: $DOCKER_PASSWORD'
+        }
       }
     }
     stage('Build-Docker-Image') {
       steps {
         container('docker') {
-          sh 'docker build -t sklpongsit/poc-ci-cd:latest .'
+          sh "docker build -t $REGISTRY/sklpongsit/poc-ci-cd:V2 ."
         }
       }
     }
-    
-     stage('Push-Images-Docker-to-DockerHub') {
+
+    stage('Push-Images-Docker-to-DockerHub') {
       steps {
         container('docker') {
-          sh 'docker push sklpongsit/poc-ci-cd:latest'
-         
+          sh "docker push $REGISTRY/sklpongsit/poc-ci-cd:V2"
         }
       }
     }
-  } 
-  //   post {
-  //     always {
-  //       container('docker') {
-  //         sh 'docker logout'
-  //     }
-  //   }
-  // }
+  }
 }
-//     stage('Build-Jar-file') {
-//       steps {
-//         container('maven') {
-//           sh 'mvn package'
-//         }
-//       }
-//     }
