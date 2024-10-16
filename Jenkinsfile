@@ -6,8 +6,8 @@ pipeline {
         kind: Pod
         spec:
           containers:
-          - name: maven
-            image: maven:alpine
+          - name: kubectl
+            image: alpine/k8s:1.29.2
             command:
             - cat
             tty: true
