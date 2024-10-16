@@ -94,8 +94,8 @@ pipeline {
       steps {
         container('kubectl') {
           script {
-            if (env.BRANCH_NAME == 'develop') {
-              ns_deploy = env.ns_develop
+            if (env.BRANCH_NAME == 'main') {
+                ns_deploy = env.ns_staging
               } else {
               error "Unsupported branch: ${env.BRANCH_NAME}"
             }
