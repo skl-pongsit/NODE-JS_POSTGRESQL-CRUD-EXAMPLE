@@ -38,8 +38,8 @@ pipeline {
           echo "Using Docker Username: $DOCKER_USERNAME"
           echo 'Using Docker Username: $DOCKER_USERNAME'
         }
-      }
         }
+      }
     stage('Login-Into-Docker') {
       steps {
         container('docker') {
@@ -62,6 +62,25 @@ pipeline {
       steps {
         container('docker') {
           sh "docker push $REGISTRY/sklpongsit/poc-ci-cd:V2"
+        }
+      }
+    }
+    stage('Prepare') { 
+      steps {
+        container('kubectl') {
+          script {
+            // Set environment variables
+            def NAMESPACE = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/namespace', returnStdout: true).trim()
+            def TOKEN = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token', returnStdout: true).trim()
+            def KUBE_API = 'https://kubernetes.default.svc.cluster.local'
+            def SA = 'jenkins-runner'
+
+            // Configure kubectl
+            sh "kubectl config set-cluster my-cluster --server=$KUBE_API --insecure-skip-tls-verify=true"
+            sh "kubectl config set-credentials $SA --token=$TOKEN --namespace=$NAMESPACE"
+            sh "kubectl config set-context my-context --user=$SA --cluster=my-cluster --namespace=$NAMESPACE"
+            sh 'kubectl config use-context my-context'
+          }
         }
       }
     }
