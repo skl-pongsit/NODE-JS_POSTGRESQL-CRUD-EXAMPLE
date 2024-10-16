@@ -29,6 +29,12 @@ pipeline {
   environment {
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
+        // dockerImage = ''
+        ns_deploy = ''
+        GIT_HASH = GIT_COMMIT.take(7)
+        ns_develop = 'develop'
+        ns_staging = 'staging'
+        application_name = 'poc-application'
   }
   stages {
       stage('Setup Credentials') {
@@ -65,7 +71,7 @@ pipeline {
         }
       }
     }
-    stage('Prepare') { 
+    stage('Prepare') {
       steps {
         container('kubectl') {
           script {
@@ -80,6 +86,27 @@ pipeline {
             sh "kubectl config set-credentials $SA --token=$TOKEN --namespace=$NAMESPACE"
             sh "kubectl config set-context my-context --user=$SA --cluster=my-cluster --namespace=$NAMESPACE"
             sh 'kubectl config use-context my-context'
+          }
+        }
+      }
+    }
+    stage('Deploy') {
+      steps {
+        container('kubectl') {
+          script {
+            if (env.BRANCH_NAME == 'develop') {
+              ns_deploy = env.ns_develop
+              } else {
+              error "Unsupported branch: ${env.BRANCH_NAME}"
+            }
+
+            sh 'kubectl get all -A'
+            sh "echo ${env.BRANCH_NAME}"
+            sh "echo ${env.GIT_COMMIT}"
+            sh "echo $ns_staging"
+            sh "echo $ns_deploy"
+
+            sh "helm upgrade -i ${env.application_name} helm-generic-chart -f deployment/values-${ns_deploy}.yaml --set image.repository=sklpongsit/${env.application_name} --set image.tag=${env.BRANCH_NAME}-${env.GIT_HASH} --set fullnameOverride=${env.application_name} -n ${ns_deploy}"
           }
         }
       }
