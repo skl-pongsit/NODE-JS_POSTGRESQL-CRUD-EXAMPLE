@@ -29,7 +29,7 @@ pipeline {
   environment {
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
-        // dockerImage = ''
+        dockerImage = 'sklpongsit/poc-ci-cd:V2'
         // ns_deploy = ''
         // GIT_HASH = GIT_COMMIT.take(7)
         // ns_develop = 'develop'
