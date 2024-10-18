@@ -29,13 +29,16 @@ pipeline {
   environment {
         REGISTRY = 'docker.io'
         IMAGE_NAME = 'sklpongsit/poc-ci-cd'
-        dockerImage = 'sklpongsit/poc-ci-cd:V2'
+        DOCKER_IMAGE = 'sklpongsit/poc-ci-cd:V2'
         // ns_deploy = ''
         // GIT_HASH = GIT_COMMIT.take(7)
         // ns_develop = 'develop'
         // ns_staging = 'staging'
-        // application_name = 'poc-application'
+        // application_name = 'kubectl'
 
+        K8S_NAMESPACE = ''
+        K8S_DEPLOYMENT = ''
+        APP_NAME = ''
   }
   stages {
       stage('Setup Credentials') {
@@ -116,25 +119,31 @@ pipeline {
       steps {
         container('kubectl') {
           script {
-            // ตรวจสอบว่า image อยู่บน DockerHub
-            sh "docker pull $IMAGE_NAME"
+                // Set environment variables
+                def NAMESPACE = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/namespace', returnStdout: true).trim()
+                def TOKEN = sh(script: 'cat /var/run/secrets/kubernetes.io/serviceaccount/token', returnStdout: true).trim()
+                def KUBE_API = 'https://kubernetes.default.svc.cluster.local'
+                def SA = 'jenkins-runner'
+
+                // Configure kubectl
+                sh "kubectl config set-cluster my-cluster --server=$KUBE_API --insecure-skip-tls-verify=true"
+                sh "kubectl config set-credentials $SA --token=$TOKEN --namespace=$NAMESPACE"
+                sh "kubectl config set-context my-context --user=$SA --cluster=my-cluster --namespace=$NAMESPACE"
+                sh 'kubectl config use-context my-context'
           }
         }
       }
     }
 
-    // stage('Deploy') {
-    //   steps {
-    //     container('kubectl') {
-    //       script {
-    //         // ใช้ kubectl เพื่อ deploy image ที่ดึงมาจาก DockerHub ไปยัง Kubernetes
-    //         sh """
-    //           kubectl set image deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE app-container=$DOCKER_IMAGE
-    //           kubectl rollout status deployment/$K8S_DEPLOYMENT -n $K8S_NAMESPACE
-    //         """
-    //       }
-    //     }
-    //   }
-    // }
+    stage('Deploy-to-Kubernetes') {
+      steps {
+        container('kubectl') {
+          sh '''
+            kubectl set image deployment/cicd-deployment app-container=$DOCKER_IMAGE --namespace=ops
+            kubectl rollout status deployment/cicd-deployment --namespace=ops
+          '''
+        }
+      }
+    }
   }
 }
