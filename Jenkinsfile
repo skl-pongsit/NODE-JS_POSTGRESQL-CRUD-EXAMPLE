@@ -32,7 +32,7 @@ spec:
   environment {
         dockerImage = ''
         ns_deploy = ''
-        DOCKER_IMAGE = 'sklpongsit/poc-ci-cd:V2'
+        DOCKER_IMAGE = 'sklpongsit/poc-ci-cd:V3'
         GIT_HASH = GIT_COMMIT.take(7)
   }
   stages {
@@ -55,6 +55,7 @@ spec:
       steps {
         container('kubectl') {
           script {
+            sh "sed -i.bak "s|image: .*|image: $DOCKER_IMAGE|" deployment.yaml" //find & replace image: xxx to image: $DOCKER_IMAGE
             sh 'kubectl apply -f deployment.yaml'
           }
         }
