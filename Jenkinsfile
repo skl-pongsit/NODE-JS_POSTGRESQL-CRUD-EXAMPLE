@@ -30,6 +30,8 @@ spec:
     }
   }
   environment {
+        dockerImage = ''
+        ns_deploy = ''
         REGISTRY = 'docker.io'
         // IMAGE_NAME = 'sklpongsit/poc-ci-cd'
         DOCKER_IMAGE = 'sklpongsit/poc-ci-cd:V2'
@@ -44,10 +46,10 @@ spec:
           script {
             dockerImage = docker.build("${env.DOCKER_IMAGE}")
             withDockerRegistry(
-                            credentialsId: 'docker-registry-credentials',
-                            url: 'https://index.docker.io/v1/') {
+                credentialsId: 'docker-registry-credentials',
+                url: 'https://index.docker.io/v1/') {
               dockerImage.push()
-                            }
+              }
           }
         }
       }
@@ -61,6 +63,6 @@ spec:
           }
         }
       }
-        }
+    }
   }
 }
