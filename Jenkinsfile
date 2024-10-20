@@ -32,8 +32,6 @@ spec:
   environment {
         dockerImage = ''
         ns_deploy = ''
-        // REGISTRY = 'docker.io'
-        // IMAGE_NAME = 'sklpongsit/poc-ci-cd'
         DOCKER_IMAGE = 'sklpongsit/poc-ci-cd:V2'
         GIT_HASH = GIT_COMMIT.take(7)
   }
