@@ -2,29 +2,30 @@ pipeline {
   agent {
     kubernetes {
       yaml '''
-        apiVersion: v1
-        kind: Pod
-        spec:
-          serviceAccountName: jenkins
-          automountServiceAccountToken: true
-          containers:
-          - name: kubectl
-            image: alpine/k8s:1.29.2
-            command:
-            - cat
-            tty: true
-          - name: docker
-            image: registry.hub.docker.com/library/docker:dind
-            command:
-            - cat
-            tty: true
-            volumeMounts:
-             - mountPath: /var/run/docker.sock
-               name: docker-sock
-          volumes:
-          - name: docker-sock
-            hostPath:
-              path: /var/run/docker.sock
+apiVersion: v1
+kind: Pod
+spec:
+  serviceAccountName: jenkins
+  automountServiceAccountToken: true
+  containers:
+  - name: kubectl
+    image: alpine/k8s:1.29.2
+    command:
+    - sleep
+    args:
+    - 99999999
+    tty: true
+  - name: docker
+    image: registry.hub.docker.com/library/docker:dind
+    command:
+      - sh
+    args:
+      - -c
+      - "/usr/local/bin/dockerd-entrypoint.sh && sleep 99999999"
+    tty: true
+    securityContext:
+      privileged: true
+      runAsUser: 0
         '''
     }
   }
@@ -60,6 +61,6 @@ pipeline {
           }
         }
       }
-    }
+        }
   }
 }
