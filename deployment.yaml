@@ -18,7 +18,7 @@ spec:
       containers:
       - name: my-app-container
         image: sklpongsit/poc-ci-cd:V2
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
         resources:
