@@ -16,7 +16,7 @@ spec:
         app: my-app
     spec:
       containers:
-      - name: my-app-container
+      - name: my-app-container-2
         image: to-be-replace-with-cicd
         imagePullPolicy: IfNotPresent
         ports:
