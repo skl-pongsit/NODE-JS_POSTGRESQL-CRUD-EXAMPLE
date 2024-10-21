@@ -32,8 +32,9 @@ spec:
   environment {
         dockerImage = ''
         ns_deploy = ''
-        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:$GIT_BRANCH-$GIT_COMMIT.take(7)"
-        GIT_HASH = GIT_COMMIT.take(7)
+
+        GIT_HASH = GIT_COMMIT.substring(0,7)
+        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:${$GIT_COMMIT.substring(0,7)}"
   }
   stages {
     stage('Build') {
@@ -55,8 +56,8 @@ spec:
       steps {
         container('kubectl') {
           script {
-            sh "sed -i.bak 's|image: .*|image: $DOCKER_IMAGE|' deployment.yaml" //find & replace image: xxx to image: $DOCKER_IMAGE
-            sh 'kubectl apply -f deployment.yaml'
+            sh "sed -i.bak 's|image: .*|image: $DOCKER_IMAGE|' deployment/deployment.yaml" //find & replace image: xxx to image: $DOCKER_IMAGE
+            sh 'kubectl apply -f deployment/deployment.yaml'
           }
         }
       }
