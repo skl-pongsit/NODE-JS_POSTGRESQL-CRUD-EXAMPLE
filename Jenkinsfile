@@ -32,7 +32,7 @@ spec:
   environment {
         dockerImage = ''
         ns_deploy = ''
-        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:V4:$GIT_BRANCH-$GIT_COMMIT.take(7)"
+        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:$GIT_BRANCH-$GIT_COMMIT.take(7)"
         GIT_HASH = GIT_COMMIT.take(7)
   }
   stages {
