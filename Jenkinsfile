@@ -57,7 +57,7 @@ spec:
         container('kubectl') {
           script {
             sh "sed -i.bak 's|image: .*|image: $DOCKER_IMAGE|' deployment/deployment.yaml" //find & replace image: xxx to image: $DOCKER_IMAGE
-            sh 'kubectl apply -f deployment/deployment.yaml'
+            sh 'kubectl apply -f deployment.yaml'
           }
         }
       }
