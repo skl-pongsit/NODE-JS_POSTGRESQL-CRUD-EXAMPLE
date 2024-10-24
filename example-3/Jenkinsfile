@@ -34,7 +34,8 @@ spec:
         ns_deploy = ''
 
         GIT_HASH = GIT_COMMIT.substring(0,7)
-        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:${GIT_COMMIT.substring(0,7)}"
+        // DOCKER_IMAGE = "sklpongsit/poc-ci-cd:${GIT_COMMIT.substring(0,7)}"
+        DOCKER_IMAGE = "sklpongsit/poc-ci-cd:${GIT_BRANCH.replaceAll('/', '-')}-${GIT_COMMIT.substring(0,7)}"
   }
   stages {
     stage('Build') {
