@@ -1,0 +1,1 @@
+helm template pongsit-cicd ./helm -n $GIT_BRANCH -f deployment/$GIT_BRANCH-values.yaml --set image=$DOCKER_IMAGE > manifest.yaml
