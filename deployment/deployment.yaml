@@ -30,17 +30,3 @@ spec:
           requests:
             memory: "64Mi"
             cpu: "250m"
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: pongsit-app-2
-  namespace: ops
-spec:
-  selector:
-    app: my-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-  type: ClusterIP
