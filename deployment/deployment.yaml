@@ -29,4 +29,4 @@ spec:
             cpu: "250m"
         imagePullPolicy: IfNotPresent #Always
       imagePullSecrets:
-      - name: my-registry-secret
+      - name: regcred
